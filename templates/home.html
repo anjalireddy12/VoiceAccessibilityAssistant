@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Text/PDF/Image/Speech Voice Reader</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #3a0ca3 0%, #720026 100%);
+            min-height: 100vh;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass-box {
+            background: rgba(255, 240, 243, 0.85);
+            padding: 2.5rem 2rem;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(58, 12, 163, 0.18);
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            border: 2px solid #720026;
+            backdrop-filter: blur(6px);
+        }
+        .glass-box h1 {
+            font-size: 2.1rem;
+            color: #720026;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .input-choice {
+            margin: 1.5rem 0 1.2rem 0;
+        }
+        .input-choice label {
+            margin-right: 1.2rem;
+            font-weight: 600;
+            color: #3a0ca3;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .input-choice label:hover {
+            color: #720026;
+        }
+        .custom-file-label, .custom-text-label {
+            display: block;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #3a0ca3;
+        }
+        .custom-file-label input[type="file"] {
+            display: none;
+        }
+        .custom-file-label span {
+            background: #720026;
+            color: #fff;
+            border-radius: 7px;
+            padding: 0.8rem 2rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+        .custom-file-label span:hover {
+            background: #3a0ca3;
+        }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            border-radius: 8px;
+            border: 1.5px solid #720026;
+            padding: 0.8rem;
+            font-size: 1.05rem;
+            background: #fff7fa;
+            resize: vertical;
+            box-shadow: 0 2px 8px #3a0ca310;
+            transition: border 0.2s;
+        }
+        textarea:focus {
+            border: 2px solid #3a0ca3;
+            outline: none;
+        }
+        .glass-box button {
+            margin-top: 1.2rem;
+            background: linear-gradient(90deg, #720026 60%, #3a0ca3 100%);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2.5rem;
+            border-radius: 7px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #3a0ca320;
+            letter-spacing: 0.5px;
+        }
+        .glass-box button:hover {
+            background: linear-gradient(90deg, #3a0ca3 60%, #720026 100%);
+            box-shadow: 0 4px 16px #72002630;
+        }
+        #speech-input-area {
+            display: none;
+            margin-top: 1rem;
+        }
+        #speech-text {
+            width: 100%;
+            min-height: 80px;
+            border-radius: 8px;
+            border: 1.5px solid #720026;
+            padding: 0.8rem;
+            font-size: 1.05rem;
+            background: #fff7fa;
+            resize: vertical;
+            box-shadow: 0 2px 8px #3a0ca310;
+            margin-bottom: 1rem;
+        }
+        #record-btn {
+            background: #720026;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 0.7rem;
+            transition: background 0.2s;
+        }
+        #record-btn.recording {
+            background: #3a0ca3;
+        }
+    </style>
+    <script>
+        function showInput(choice) {
+            document.getElementById('pdf-input').style.display = (choice === 'pdf') ? 'block' : 'none';
+            document.getElementById('text-input').style.display = (choice === 'text') ? 'block' : 'none';
+            document.getElementById('image-input').style.display = (choice === 'image') ? 'block' : 'none';
+            document.getElementById('speech-input-area').style.display = (choice === 'speech') ? 'block' : 'none';
+        }
+        window.onload = function() {
+            document.getElementById('pdf-input').style.display = 'none';
+            document.getElementById('text-input').style.display = 'none';
+            document.getElementById('image-input').style.display = 'none';
+            document.getElementById('speech-input-area').style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <form class="glass-box" action="{% url 'result2' %}" method="post" enctype="multipart/form-data" id="mainForm">
+        {% csrf_token %}
+        <h1>Text / PDF / Image / Speech Voice Reader</h1>
+        <div class="input-choice">
+            <label>
+                <input type="radio" name="input_type" value="text" onclick="showInput('text')" required>
+                Paste Text
+            </label>
+
+            <br>
+            <label>
+                <input type="radio" name="input_type" value="pdf" onclick="showInput('pdf')">
+                Upload PDF
+            </label>
+            <br>
+            <label>
+                <input type="radio" name="input_type" value="image" onclick="showInput('image')">
+                Upload Image
+            </label>
+            <br>
+            
+            <label>
+                <input type="radio" name="input_type" value="speech" onclick="showInput('speech')">
+                Speech to Text
+            </label>
+        </div>
+        <div id="text-input">
+            <label class="custom-text-label" for="input_text">Paste your text below:</label>
+            <textarea name="input_text" id="input_text" placeholder="Enter text here..."></textarea>
+        </div>
+        <div id="pdf-input">
+            <label class="custom-file-label">
+                <span>Choose PDF File</span>
+                <input type="file" name="pdf_file" accept="application/pdf">
+            </label>
+        </div>
+        <div id="image-input">
+            <label class="custom-file-label">
+                <span>Choose Image File</span>
+                <input type="file" name="image_file" accept="image/*">
+            </label>
+        </div>
+        <div id="speech-input-area">
+            <button type="button" id="record-btn">🎤 Start Recording</button>
+            <textarea id="speech-text" name="speech_text" placeholder="Your speech will appear here..." readonly></textarea>
+            <input type="hidden" name="speech_text_hidden" id="speech_text_hidden">
+            <button type="button" onclick="submitSpeech()" style="margin-top:0.5rem;">Submit Speech</button>
+        </div>
+        <button type="submit" id="main-submit-btn">Submit & Listen</button>
+    </form>
+    <script>
+        // Hide main submit button if speech mode is active
+        function submitSpeech() {
+            document.getElementById('speech_text_hidden').value = document.getElementById('speech-text').value;
+            let form = document.getElementById('mainForm');
+            form.action = "{% url 'result2' %}";
+            form.submit();
+        }
+        // Speech Recognition
+        let recognizing = false;
+        let finalTranscript = '';
+        let recognition;
+        let recordBtn = document.getElementById('record-btn');
+        let speechText = document.getElementById('speech-text');
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                recognizing = true;
+                recordBtn.innerText = "🛑 Stop Recording";
+                recordBtn.classList.add("recording");
+            };
+            recognition.onerror = function(event) {
+                recognizing = false;
+                recordBtn.innerText = "🎤 Start Recording";
+                recordBtn.classList.remove("recording");
+            };
+            recognition.onend = function() {
+                recognizing = false;
+                recordBtn.innerText = "🎤 Start Recording";
+                recordBtn.classList.remove("recording");
+            };
+            recognition.onresult = function(event) {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                speechText.value = finalTranscript + interimTranscript;
+            };
+            recordBtn.onclick = function() {
+                if (recognizing) {
+                    recognition.stop();
+                    recognizing = false;
+                } else {
+                    finalTranscript = '';
+                    speechText.value = '';
+                    recognition.start();
+                }
+            };
+        } else {
+            recordBtn.onclick = function() {
+                alert("Sorry, your browser does not support speech recognition.");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF/Text Voice Result</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: linear-gradient(135deg, #3a0ca3 0%, #720026 100%);
+        }
+        .result-container {
+            background: rgba(255, 240, 243, 0.93);
+            max-width: 980px;
+            margin: 5vh auto;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(58, 12, 163, 0.15);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 2px solid #720026;
+            backdrop-filter: blur(6px);
+        }
+        .result-container h2 {
+            color: #720026;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        .large-textbox {
+            background: #fff7fa;
+            padding: 1.8rem;
+            border-radius: 12px;
+            font-size: 1.18rem;
+            color: #222;
+            max-height: 600px;
+            min-height: 420px;
+            width: 100%;
+            overflow-y: auto;
+            margin-bottom: 2.5rem;
+            text-align: left;
+            box-sizing: border-box;
+            border: 1.5px solid #720026;
+            box-shadow: 0 2px 8px #3a0ca310;
+            transition: border 0.2s;
+            outline: none;
+            cursor: text;
+            white-space: pre-wrap;
+        }
+        .large-textbox:focus {
+            border: 2px solid #3a0ca3;
+        }
+        .voice-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .voice-btn {
+            background: linear-gradient(90deg, #720026 60%, #3a0ca3 100%);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2.5rem;
+            border-radius: 7px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #3a0ca320;
+            letter-spacing: 0.5px;
+        }
+        .voice-btn:hover {
+            background: linear-gradient(90deg, #3a0ca3 60%, #720026 100%);
+            box-shadow: 0 4px 16px #72002630;
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <h2>Extracted Text</h2>
+        <div id="pdfText" class="large-textbox" contenteditable="true" spellcheck="false" title="Click to set cursor and play from here">{{ extracted_text }}</div>
+        <div class="voice-controls">
+            <button class="voice-btn" onclick="playVoiceFromCursor()">▶️ Play from Cursor</button>
+            <button class="voice-btn" id="pauseResumeBtn" onclick="togglePauseResume()">⏸️ Pause</button>
+            <button class="voice-btn" onclick="replayVoice()">🔁 Replay</button>
+        </div>
+    </div>
+    <script>
+        let synth = window.speechSynthesis;
+        let utterance = null;
+        let isPlaying = false;
+        let isPaused = false;
+        let lastStartOffset = 0;
+        let textContent = document.getElementById('pdfText').innerText;
+
+        // Helper to get caret position in contenteditable div
+        function getCaretCharacterOffsetWithin(element) {
+            let caretOffset = 0, sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                let range = sel.getRangeAt(0);
+                let preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(element);
+                preCaretRange.setEnd(range.endContainer, range.endOffset);
+                caretOffset = preCaretRange.toString().length;
+            }
+            return caretOffset;
+        }
+
+        function playVoiceFromCursor() {
+            // Stop any ongoing speech
+            if (synth.speaking || synth.paused) synth.cancel();
+            let div = document.getElementById('pdfText');
+            let text = div.innerText;
+            let caret = getCaretCharacterOffsetWithin(div);
+            let speakText = text.substring(caret).trim();
+            if (!speakText) {
+                alert("No text to read from cursor.");
+                return;
+            }
+            utterance = new SpeechSynthesisUtterance(speakText);
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.lang = 'en-US';
+            utterance.onend = function() {
+                isPlaying = false;
+                isPaused = false;
+                document.getElementById('pauseResumeBtn').innerText = "⏸️ Pause";
+            };
+            synth.speak(utterance);
+            isPlaying = true;
+            isPaused = false;
+            document.getElementById('pauseResumeBtn').innerText = "⏸️ Pause";
+            lastStartOffset = caret;
+        }
+
+        function togglePauseResume() {
+            if (synth.speaking && !synth.paused) {
+                synth.pause();
+                isPaused = true;
+                document.getElementById('pauseResumeBtn').innerText = "▶️ Resume";
+            } else if (synth.paused) {
+                synth.resume();
+                isPaused = false;
+                document.getElementById('pauseResumeBtn').innerText = "⏸️ Pause";
+            }
+        }
+
+        function replayVoice() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            isPlaying = false;
+            isPaused = false;
+            document.getElementById('pauseResumeBtn').innerText = "⏸️ Pause";
+            setTimeout(() => {
+                // Replay from start
+                let div = document.getElementById('pdfText');
+                let text = div.innerText.trim();
+                if (!text) {
+                    alert("No text to read.");
+                    return;
+                }
+                utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                utterance.lang = 'en-US';
+                utterance.onend = function() {
+                    isPlaying = false;
+                    isPaused = false;
+                    document.getElementById('pauseResumeBtn').innerText = "⏸️ Pause";
+                };
+                synth.speak(utterance);
+                isPlaying = true;
+                isPaused = false;
+            }, 150);
+        }
+
+        window.onbeforeunload = function() {
+            if (synth.speaking) synth.cancel();
+        };
+    </script>
+</body>
+</html>

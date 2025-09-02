@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Voice Assistant - Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --wine-bg: #2c001e;
+            --wine-dark: #4b183a;
+            --wine-accent: #a8325e;
+            --wine-gold: #f4e2d8;
+            --wine-cream: #f8f6f0;
+            --wine-white: #fff;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--wine-bg);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: var(--wine-cream);
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(44,0,30,0.18);
+            padding: 34px 24px 24px 24px;
+        }
+        h1 {
+            text-align: center;
+            color: var(--wine-accent);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .suggestions {
+            background: var(--wine-gold);
+            border-left: 5px solid var(--wine-accent);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 30px;
+        }
+        .suggestions h2 {
+            margin-top: 0;
+            font-size: 1.15em;
+            color: var(--wine-dark);
+        }
+        .suggestions ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+        .suggestions li {
+            margin-bottom: 7px;
+            font-size: 1em;
+            color: var(--wine-dark);
+        }
+        .mic-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 28px;
+        }
+        .mic-btn {
+            background: var(--wine-accent);
+            border: none;
+            border-radius: 50%;
+            width: 66px;
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(44,0,30,0.12);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .mic-btn:hover {
+            background: #c94f7c;
+        }
+        .mic-btn:active {
+            background: #7a2145;
+        }
+        .mic-icon {
+            width: 34px;
+            height: 34px;
+            fill: var(--wine-white);
+        }
+        .result-block {
+            margin-bottom: 18px;
+            padding: 16px;
+            border-radius: 8px;
+            background: var(--wine-gold);
+            border: 1px solid #d6b6a8;
+        }
+        .label {
+            font-weight: bold;
+            color: var(--wine-accent);
+            margin-bottom: 6px;
+            display: block;
+        }
+        .output {
+            font-family: 'Consolas', 'Menlo', monospace;
+            background: var(--wine-cream);
+            padding: 10px 12px;
+            border-radius: 6px;
+            color: #2c001e;
+            font-size: 1em;
+            overflow-x: auto;
+        }
+        .code-block {
+            background: #1a0c18;
+            color: #f4e2d8;
+            border-radius: 7px;
+            padding: 14px 16px;
+            font-size: 1em;
+            font-family: 'Consolas', 'Menlo', monospace;
+            margin-bottom: 10px;
+            white-space: pre;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #a8325e;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            color: #8b5b7a;
+            font-size: 0.95em;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 14px 2vw 18px 2vw; }
+        }
+        .prompt-block {
+            background: #f8f6f0;
+            color: #a8325e;
+            border: 2px dashed #a8325e;
+            border-radius: 7px;
+            padding: 18px;
+            margin-bottom: 18px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+    function copyCode() {
+        var code = document.getElementById("generatedCodeText").textContent;
+        navigator.clipboard.writeText(code);
+        alert("Code copied to clipboard!");
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Voice Assistant</h1>
+        <div class="suggestions">
+            <h2>🎤 Try saying:</h2>
+            <ul>
+                <li><b>Open a folder:</b> <span style="color:#a8325e;">"Open Projects from desktop"</span></li>
+                <li><b>Open a file in VSCode:</b> <span style="color:#a8325e;">"Open notes.txt from documents on vscode"</span></li>
+                <li><b>Create a folder:</b> <span style="color:#a8325e;">"Create folder Reports"</span></li>
+                <li><b>Create a file:</b> <span style="color:#a8325e;">"Create file summary.txt"</span></li>
+                <li><b>Delete an item:</b> <span style="color:#a8325e;">"Delete notes.txt"</span></li>
+                <li><b>Open an app:</b> <span style="color:#a8325e;">"Open calculator"</span></li>
+                <li><b>Open a website:</b> <span style="color:#a8325e;">"Open reddit"</span></li>
+                <li><b>Search Google:</b> <span style="color:#a8325e;">"Search for Python decorators"</span></li>
+                <li><b>Play a song on YouTube:</b> <span style="color:#a8325e;">"Play Shape of You on YouTube"</span></li>
+                <li><b>Play a song on Spotify:</b> <span style="color:#a8325e;">"Play Imagine Dragons on Spotify"</span></li>
+                <li><b>Get the weather:</b> <span style="color:#a8325e;">"What's the weather?"</span></li>
+                <li><b>Get the time:</b> <span style="color:#a8325e;">"What time is it?"</span></li>
+                <li><b>Take a screenshot:</b> <span style="color:#a8325e;">"Take a screenshot"</span></li>
+                <li><b>Write a note:</b> <span style="color:#a8325e;">"Make a note"</span></li>
+                <li><b>Set a reminder:</b> <span style="color:#a8325e;">"Set a reminder"</span></li>
+                <li><b>Crack a joke (pyjokes):</b> <span style="color:#a8325e;">"Crack a joke"</span></li>
+                <li><b>Tell me a joke (Gemini):</b> <span style="color:#a8325e;">"Tell me a joke"</span></li>
+                <li><b>Generate code:</b> <span style="color:#a8325e;">"Generate code to reverse a string"</span></li>
+                <li><b>Open a drive:</b> <span style="color:#a8325e;">"Open D drive"</span></li>
+                <li><b>Exit:</b> <span style="color:#a8325e;">"Exit" or "Stop"</span></li>
+            </ul>
+        </div>
+
+        {% if ask_app %}
+        <div class="prompt-block">
+            Where should I open <b>{{ pending_target }}</b>?<br>
+            Say: "vscode", "notepad", "excel", "word", or "explorer".
+        </div>
+        {% endif %}
+
+        <form method="post" class="mic-form">
+            {% csrf_token %}
+            <button type="submit" class="mic-btn" title="Press to Speak">
+                <svg class="mic-icon" viewBox="0 0 24 24">
+                    <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V21a1 1 0 1 0 2 0v-2.08A7 7 0 0 0 19 12z"/>
+                </svg>
+            </button>
+        </form>
+
+        <div class="result-block">
+            <span class="label">Recognized Command:</span>
+            <div class="output">{{ recognized_text }}</div>
+        </div>
+
+        {% if generated_code %}
+        <div class="result-block">
+            <span class="label">Generated Code:</span>
+            <div class="code-block" id="generatedCodeText">{{ generated_code }}</div>
+            <button class="copy-btn" onclick="copyCode()">Copy</button>
+        </div>
+        {% endif %}
+
+        {% if suggestion_prompt %}
+        <div class="result-block">
+            <span class="label">Suggestion:</span>
+            <div class="output">{{ suggestion_prompt }}</div>
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            Voice Assistant &mdash; Powered by AI<br>
+            <small>Press the microphone, then speak a command.</small>
+        </div>
+    </div>
+</body>
+</html>
